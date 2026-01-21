@@ -14,15 +14,29 @@ const Home = () => {
 
   // Mengambil data" di firebase
   React.useEffect(() => {
-    const unsub = async () => {
-      const postCol = await getDocs(collection(db, "posts"));
-      const postRef = postCol.docs.map(doc => ({
-        collection_id: doc.id,
-        ...doc.data()
-      }))
-      setPosts(postRef)
-    }
-    return () => unsub();
+    let isMounted = true;
+
+    const fetchPosts = async () => {
+      try {
+        const postCol = await getDocs(collection(db, "posts"));
+        const postRef = postCol.docs.map(doc => ({
+          collection_id: doc.id,
+          ...doc.data()
+        }));
+
+        if (isMounted) {
+          setPosts(postRef);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchPosts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -86,26 +100,26 @@ const Home = () => {
         <div className="my-card-content mt-[2rem] w-full">
           <h1 className="text-2xl mb-5 font-black">Kegiatan Terbaru</h1>
           <div className="carousel carousel-center w-full space-x-4 rounded-box">
-          {
-            posts.map((post,idx) => (
-            <div key={idx} className="carousel-item py-[1rem]">
-              <div className="card bg-base-300 w-96 shadow-sm">
-                <figure>
-                  <iframe className="rounded-lg w-full aspect-[4/3]"
-                    src={post.img}
-                    alt={post.title}></iframe>
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">{post.title}</h2>
-                  <p>{post.description}</p>
-                  <div className="card-actions justify-end">
-                    <p>{post.time.toDate().toLocaleDateString('id-IN')}</p>
-                    <button className="btn btn-primary">Lihat</button>
+            {
+              posts.map((post, idx) => (
+                <div key={idx} className="carousel-item py-[1rem]">
+                  <div className="card bg-base-300 w-96 shadow-sm">
+                    <figure>
+                      <iframe className="rounded-lg w-full aspect-[4/3]"
+                        src={post.img}
+                        alt={post.title}></iframe>
+                    </figure>
+                    <div className="card-body">
+                      <h2 className="card-title">{post.title}</h2>
+                      <p>{post.description}</p>
+                      <div className="card-actions justify-end">
+                        <p>{post.time.toDate().toLocaleDateString('id-IN')}</p>
+                        <button className="btn btn-primary">Lihat</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              ))}
           </div>
         </div>
       </main>
