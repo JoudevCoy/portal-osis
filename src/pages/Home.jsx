@@ -14,7 +14,7 @@ const Home = () => {
 
   // Mengambil data" di firebase
   React.useEffect(() => {
-    return async () => {
+    const unsub = async () => {
       const postCol = await getDocs(collection(db, "posts"));
       const postRef = postCol.docs.map(doc => ({
         collection_id: doc.id,
@@ -22,6 +22,7 @@ const Home = () => {
       }))
       setPosts(postRef)
     }
+    return () => unsub();
   }, []);
 
   return (
