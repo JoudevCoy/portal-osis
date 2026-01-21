@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Fas from '@fortawesome/free-solid-svg-icons';
 import osisCoverImg from './../assets/osis-cover.jpg';
 
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "./../../config/firebase.config.js";
 import Navbar from './../components/Navbar.jsx';
 
@@ -18,7 +18,7 @@ const Home = () => {
 
     const fetchPosts = async () => {
       try {
-        const postCol = await getDocs(collection(db, "posts"));
+        const postCol = await getDocs(query(collection(db, "posts"), orderBy("time", "desc")));
         const postRef = postCol.docs.map(doc => ({
           collection_id: doc.id,
           ...doc.data()
